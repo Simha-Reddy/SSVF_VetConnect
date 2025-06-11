@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Approved</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="global-top-bar">
+        <a href="index.html" class="top-bar-link">SSVF VetConnect</a>
+        <span class="portal-name">Veteran Portal</span>
+    </div>
+    <div class="container">
+        <h1>Thank You!</h1>
+        <p>Your approval has been granted to the SSVF agency. To complete the process, please select your agency and case manager below.</p>
+
+        <form id="veteranForm">
+            <label for="agency">Select Your Agency:</label>
+            <select id="agency" name="agency" required>
+                <option value="">Select Agency</option>
+                <!-- Agencies will be populated dynamically -->
+            </select>
+
+            <label for="caseManager">Select Your Case Manager:</label>
+            <select id="caseManager" name="caseManager" required>
+                <option value="">Select Case Manager</option>
+                <!-- Case Managers will be populated dynamically -->
+            </select>
+
+            <button type="submit" class="button-green">Submit</button>
+        </form>
+
+        <div id="status" style="margin-top: 18px;"></div>
+    </div>
+
+    <div class="container" style="margin-top:32px;">
+        <div class="veteran-checklist" style="background: #f6f8fa; border-radius: 8px; padding: 24px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); max-width: 700px; margin: 0 auto; text-align:left;">
+            <h2 style="color:#205493; margin-top:0; margin-bottom:18px;">Veteran Health Care Connection Checklist</h2>
+            <p style="font-size:1.08em; margin-bottom:18px;">
+                <strong>Ask your SSVF Case Manager for assistance. They're here to help!</strong>
+            </p>
+            <div style="margin-bottom: 10px;">
+                <details>
+                    <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 1: Get a VA Appointment</summary>
+                    <ul style="margin-top:8px;">
+                        <li>Contact your Primary Care Clinic or local VA.</li>
+                        <li>Ask about VA Telehealth options:
+                            <ul>
+                                <li><b>VA Video Connect (VVC)</b> or <b>Clinical Video Telehealth (CVT)</b> lets you see your doctor by phone, tablet, or computer.</li>
+                                <li>Telehealth can help you avoid travel, save time, and get care quickly.</li>
+                                <li>
+                                    See the 
+                                    <a href="telehealth_quick_card.html" target="_blank" style="color:#205493; text-decoration:underline;">
+                                        Telehealth Quick Card
+                                    </a> 
+                                    for tips on using VA Telehealth and getting connected.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </details>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <details>
+                    <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 2: Access Physical and Mental Healthcare</summary>
+                    <ul style="margin-top:8px;">
+                        <li>Secure a Primary Care Provider (PCP) through your Patient Aligned Care Team (PACT).</li>
+                        <li>Work with your case manager or healthcare navigator if you have difficulty accessing care.</li>
+                        <li>Schedule needed care:
+                            <ul>
+                                <li>Primary Care</li>
+                                <li>Mental Health</li>
+                                <li>Substance Use Treatment</li>
+                                <li>Prescriptions</li>
+                                <li>Follow-up Appointments</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </details>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <details>
+                    <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 3: Include Your Healthcare Navigator in your VA Care Team</summary>
+                    <ul style="margin-top:8px;">
+                        <li>Let your VA team know if you have a healthcare navigator or case manager helping you.</li>
+                    </ul>
+                </details>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <details>
+                    <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 4: Transportation Help</summary>
+                    <ul style="margin-top:8px;">
+                        <li>Ask the VA or navigator about:
+                            <ul>
+                                <li>Travel pay</li>
+                                <li>VA shuttles</li>
+                                <li>Veteran service organization rides</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </details>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <details>
+                    <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 5: Access Additional Support</summary>
+                    <ul style="margin-top:8px;">
+                        <li>Ask the healthcare navigator or VA social worker to connect you to:
+                            <ul>
+                                <li>Dental and vision care</li>
+                                <li>Vocational rehabilitation</li>
+                                <li>Benefits and claims assistance</li>
+                                <li>Legal and advocacy support</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </details>
+            </div>
+            <div style="margin-top:18px;">
+                <h3 style="margin-bottom:8px; color:#205493;">Key Phone Numbers</h3>
+                <ul style="list-style:none; padding-left:0; font-size:1.08em;">
+                    <li><b>VA Benefits / Enrollment:</b> 1-877-222-VETS (8387)</li>
+                    <li><b>Veterans Crisis Line:</b> 988, then press 1</li>
+                    <li><b>SSVF Health Care Navigator (local contact):</b> <span style="color:#888;">_____________</span></li>
+                    <li><b>Transportation Help (local contact):</b> <span style="color:#888;">______________</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const agencyDropdown = document.getElementById("agency");
+            const caseManagerDropdown = document.getElementById("caseManager");
+
+            try {
+                // Fetch agencies from the backend
+                console.log("Fetching agencies...");
+                const agencyResponse = await fetch("/api/agencies");
+                if (!agencyResponse.ok) throw new Error("Failed to fetch agencies");
+
+                const agencies = await agencyResponse.json();
+                console.log("Agencies fetched:", agencies);
+
+                // Populate the agency dropdown
+                agencies.forEach(agency => {
+                    const option = document.createElement("option");
+                    option.value = agency.id;
+                    option.textContent = agency.name;
+                    agencyDropdown.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error loading agencies:", error);
+                alert("Failed to load agencies. Please try again later.");
+            }
+
+            // Update case managers when an agency is selected
+            agencyDropdown.addEventListener("change", async () => {
+                const selectedAgencyId = agencyDropdown.value;
+                console.log("Selected agency ID:", selectedAgencyId);
+
+                // Clear existing case managers
+                caseManagerDropdown.innerHTML = '<option value="">Select Case Manager</option>';
+
+                if (selectedAgencyId) {
+                    try {
+                        console.log(`Fetching case managers for agency ID: ${selectedAgencyId}`);
+                        const caseManagerResponse = await fetch(`/api/case_managers?agency_id=${selectedAgencyId}`);
+                        if (!caseManagerResponse.ok) throw new Error("Failed to fetch case managers");
+
+                        const caseManagers = await caseManagerResponse.json();
+                        console.log("Case managers fetched:", caseManagers);
+
+                        // Populate the case manager dropdown
+                        caseManagers.forEach(cm => {
+                            const option = document.createElement("option");
+                            option.value = cm.id;
+                            option.textContent = cm.username;
+                            caseManagerDropdown.appendChild(option);
+                        });
+                    } catch (error) {
+                        console.error("Error loading case managers:", error);
+                        alert("Failed to load case managers. Please try again later.");
+                    }
+                }
+            });
+        });
+
+        // Handle form submission
+        document.getElementById("veteranForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const agencyId = document.getElementById("agency").value;
+            const caseManagerId = document.getElementById("caseManager").value;
+
+            console.log("Submitting form with data:", { agency_id: agencyId, case_manager_id: caseManagerId });
+
+            if (!agencyId || !caseManagerId) {
+                alert("Please select both an agency and a case manager.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/assign_veteran", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ agency_id: parseInt(agencyId), case_manager_id: parseInt(caseManagerId) })
+                });
+
+                const data = await response.json();
+                console.log("Response from /api/assign_veteran:", data);
+
+                const statusDiv = document.getElementById("status");
+
+                if (data.success) {
+                    statusDiv.textContent = "You have been successfully assigned to a case manager!";
+                    statusDiv.style.color = "green";
+                } else {
+                    statusDiv.textContent = data.error || "An error occurred. Please try again.";
+                    statusDiv.style.color = "red";
+                }
+            } catch (error) {
+                console.error("Error during form submission:", error);
+                alert("Failed to assign a case manager. Please try again later.");
+            }
+        });
+    </script>
+</body>
+</html>

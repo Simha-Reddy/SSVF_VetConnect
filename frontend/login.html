@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Manager Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="global-top-bar">
+        <a href="index.html" class="top-bar-link">SSVF VetConnect</a>
+        <span class="portal-name">Case Manager Portal</span>
+    </div>
+    <div class="container">
+        <h1>Case Manager Portal Login</h1>
+        <form id="loginForm">
+            <label for="agency">Agency:</label>
+            <select id="agency" name="agency" required>
+                <option value="">Select Agency</option>
+                <!-- Agencies will be populated dynamically -->
+            </select>
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit" class="button-green">Log In</button>
+        </form>
+    </div>
+
+    <div class="container" style="margin-top:32px;">
+        <div class="demo-instructions" style="padding:16px; background:#f6f8fa; border-radius:6px;">
+            <strong>Demo Instructions:</strong>
+            <p>
+                In the actual version, case managers would securely log in using AccessVA with ID.me or Login.gov. For this demo, use one of the sample accounts below:
+            </p>
+            <table border="1" cellpadding="6" style="border-collapse:collapse; background:#fff;">
+                <thead>
+                    <tr>
+                        <th>Agency</th>
+                        <th>User Name</th>
+                        <th>Password</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>YWCA of Seattle</td>
+                        <td>Gilligan</td>
+                        <td>Password</td>
+                    </tr>
+                    <tr>
+                        <td>YWCA of Seattle</td>
+                        <td>Professor</td>
+                        <td>Password</td>
+                    </tr>
+                    <tr>
+                        <td>CCS of Western Washington</td>
+                        <td>Ginger</td>
+                        <td>Password</td>
+                    </tr>
+                    <tr>
+                        <td>CCS of Western Washington</td>
+                        <td>Mary Ann</td>
+                        <td>Password</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Populate the agency dropdown on page load
+        document.addEventListener("DOMContentLoaded", async () => {
+            const agencyDropdown = document.getElementById("agency");
+
+            try {
+                const response = await fetch("/api/agencies");
+                if (!response.ok) throw new Error("Failed to fetch agencies");
+
+                const agencies = await response.json();
+                agencies.forEach(agency => {
+                    const option = document.createElement("option");
+                    option.value = agency.id;
+                    option.textContent = agency.name;
+                    agencyDropdown.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error loading agencies:", error);
+                alert("Failed to load agencies. Please try again later.");
+            }
+        });
+
+        // Handle login form submission
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const agency = document.getElementById("agency").value;
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const response = await fetch("/case_manager_login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ agency_id: agency, username, password }),
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = "/dashboard";
+                } else {
+                    alert(data.error || "Login failed");
+                }
+            } catch (error) {
+                console.error("Error during login:", error);
+                alert("An error occurred. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>

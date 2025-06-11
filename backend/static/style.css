@@ -1,0 +1,474 @@
+/* === GLOBAL STYLES === */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e5ecf3;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+/* Container */
+.container {
+    width: 100%; /* Allow the container to take up the full width of its parent */
+    max-width: 100%; /* Allow the container to grow dynamically up to 100% */
+    margin: 16px auto; /* Center the container horizontally */
+    background: #ffffffee;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px 40px;
+    text-align: center;
+    overflow: auto; /* Allow scrolling if content exceeds the viewport */
+    box-sizing: border-box; /* Include padding and border in the width calculation */
+    display: inline-block; /* Allow the container to grow with its content */
+}
+
+/* Header Bar */
+.header-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Header Title */
+.header-title {
+    font-size: 2.8em;
+    font-style: italic;
+    font-weight: 600;
+    color: #3498db;
+}
+
+/* Global Top Bar */
+.global-top-bar {
+    background-color: #3498db; /* Updated color */
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.top-bar-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.5em; /* Slightly larger font size */
+    font-weight: 700; /* Bold text */
+    font-style: italic; /* Italicized the link */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    letter-spacing: 0.5px; /* Slight spacing between letters */
+}
+
+.top-bar-link:hover {
+    text-decoration: underline;
+    color: #aeeaff; /* Light blue hover effect */
+}
+
+.portal-name {
+    font-size: 1.2em; /* Slightly larger font size */
+    font-weight: 600; /* Bold text */
+    text-align: right;    /* Changed from center to right */
+    flex-grow: 0;         /* Prevents it from taking extra space */
+    margin-left: auto;    /* Pushes it to the far right */
+    display: flex;
+    justify-content: flex-end;
+}
+
+.global-nav {
+    display: flex;
+    gap: 20px; /* Space between the links */
+    justify-content: center;
+    flex-grow: 1; /* Ensures the links are centered */
+}
+
+.global-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.2em; /* Slightly larger font size */
+    font-weight: 600; /* Bold text */
+    padding: 5px 10px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+    letter-spacing: 0.5px; /* Slight spacing between letters */
+}
+
+.global-nav a:hover {
+    border-bottom: 2px solid #aeeaff; /* Light blue underline on hover */
+    color: #aeeaff; /* Light blue hover effect */
+}
+
+/* Headings */
+/* Headings - H1 */
+h1 {
+    font-size: 2em; /* Adjust the size as needed */
+    font-weight: 700; /* Make it bold */
+    color: #3498db; /* Darker color for emphasis */
+    text-align: center; /* Center the heading */
+    margin-bottom: 20px; /* Add spacing below the heading */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    letter-spacing: 1px; /* Add slight spacing between letters */
+}
+
+h2 {
+    color: #2c3e50;
+    margin-top: 0;
+}
+
+/* Portal Links */
+.portal-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.button-link {
+    display: inline-block;
+    padding: 10px 20px; /* Shortened button height */
+    font-size: 1.2em;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #3498db;
+    font-weight: 600;
+    background-color: white;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.button-link:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.button-link:active {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+/* Green Button */
+.button-green {
+    background: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px; /* Shortened button height */
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin: 0 2px;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(46, 204, 113, 0.07);
+}
+
+.button-green:hover {
+    background: #27ae60;
+}
+
+.button-green:active {
+    background: #219150;
+}
+
+/* Red Button (Cancel Button) */
+.button-red {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px; /* Shortened button height */
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin: 0 2px;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.07);
+}
+
+.button-red:hover {
+    background: #c0392b;
+}
+
+.button-red:active {
+    background: #a93226;
+}
+
+/* Subtitle */
+.subtitle {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.subtitle a {
+    color: #004085;
+    text-decoration: none;
+}
+
+.subtitle a:hover {
+    text-decoration: underline;
+}
+
+/* Status and Patient Info */
+#status, #patient-info {
+    margin-top: 18px;
+    font-size: 1em;
+    color: #333;
+}
+
+/* Filter Input */
+#filterInput {
+    margin-bottom: 10px;
+    width: 320px;
+    border: 1.5px solid #3498db;
+    border-radius: 6px;
+    padding: 10px 12px; /* Shortened input height */
+    font-size: 1em; /* Matches dropdown menu font size */
+}
+
+/* Dropdown Menu */
+select {
+    padding: 8px 10px; /* Shortened dropdown height */
+    font-size: 1em; /* Matches input font size */
+    border-radius: 6px;
+    border: 1.5px solid #3498db;
+    background-color: #fff;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+select:focus {
+    border-color: #2ecc71;
+}
+
+/* Date Input */
+input[type="date"] {
+    padding: 8px 10px; /* Matches dropdown menu height */
+    font-size: 1em; /* Matches dropdown menu font size */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Explicitly set font */
+    border-radius: 6px;
+    border: 1.5px solid #3498db;
+    background-color: #fff;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%; /* Optional: Adjust width as needed */
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+input[type="date"]:focus {
+    border-color: #2ecc71; /* Green border on focus */
+}
+
+/* Case Notes Preview (Clickable Indicator) */
+.notes-preview {
+    display: inline-block;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    color: #3498db; /* Blue color for clickable indicator */
+    cursor: pointer;
+    text-decoration: underline; /* Underline to indicate interactivity */
+}
+
+.notes-preview:hover {
+    color: #2ecc71; /* Green hover effect */
+}
+
+/* Table */
+#veteranTable {
+    width: auto; /* Allow the table to define its own width */
+    border-collapse: collapse;
+    margin: 18px auto; /* Center the table horizontally */
+    font-size: 1em;
+    background: #fff;
+}
+
+#veteranTable th, #veteranTable td {
+    border: 1px solid #e0e6ea;
+    padding: 10px 12px;
+    text-align: left;
+    word-wrap: break-word; /* Ensure long text wraps within the cell */
+}
+
+#veteranTable th {
+    background: #f4f8fb;
+    color: #3498db;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+#veteranTable th:hover {
+    background: #eaf3fa;
+}
+
+#veteranTable tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+/* Modal Styles */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #0008;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px 24px 20px 24px;
+    min-width: 320px;
+    max-width: 95vw;
+    box-shadow: 0 8px 32px #0003;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #3498db;
+}
+
+.modal-content textarea {
+    width: 100%;
+    min-height: 120px;
+    font-size: 1em;
+    padding: 10px;
+    border-radius: 7px;
+    border: 1.5px solid #3498db;
+    resize: vertical;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+}
+
+.modal-actions {
+    text-align: right;
+}
+
+.modal-actions button {
+    min-width: 80px;
+}
+
+/* Login Form Styles */
+/* Make all form controls look similar and stack vertically */
+#loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+#loginForm label {
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+#loginForm select,
+#loginForm input[type="text"],
+#loginForm input[type="password"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    background: #fff;
+    box-sizing: border-box;
+    margin-bottom: 0;
+}
+
+#loginForm button {
+    margin-top: 12px;
+}
+
+.main-flex {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    margin: 16px auto;
+    background: #ffffffee;           /* Match container background */
+    border-radius: 14px;             /* Match container border radius */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08); /* Match container shadow */
+    padding: 30px 40px;              /* Match container padding */
+}
+.main-flex > div {
+    flex: 1;
+    min-width: 340px;
+}
+.centered-checklist {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+}
+.veteran-checklist {
+    background: #f6f8fa;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    padding: 24px 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .container {
+        padding: 18px 6px;
+        max-width: 99vw;
+    }
+    table, th, td {
+        font-size: 0.97em;
+    }
+    #filterInput {
+        width: 70%;
+    }
+    .main-flex {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 8px 2px;
+    }
+    table, th, td {
+        font-size: 0.93em;
+        padding: 7px 4px;
+    }
+    .global-top-bar {
+        font-size: 1.1em;
+        padding: 10px 0;
+    }
+
+    /* Responsive Table for Phones */
+    #veteranTable th:not(:first-child),
+    #veteranTable td:not(:first-child) {
+        display: none; /* Hide all columns except the first (Name) */
+    }
+
+    #veteranTable th:first-child,
+    #veteranTable td:first-child {
+        text-align: left; /* Align the Name column to the left */
+        cursor: pointer; /* Indicate interactivity */
+        color: #3498db; /* Highlight the clickable name */
+        text-decoration: underline; /* Underline to indicate interactivity */
+    }
+}
