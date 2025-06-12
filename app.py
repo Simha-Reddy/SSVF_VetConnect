@@ -389,6 +389,47 @@ def get_patient_summary(icn, access_token):
     else:
         print(f"[ERROR] Failed to fetch PractitionerRole resource: {resp.text}")
 
+    # 4. Service Requests (Consults/Orders)
+    service_requests_url = f"{FHIR_API_BASE}/ServiceRequest"
+    params = {
+        "patient": icn,
+        "status": "active,on-hold",
+        "_count": 100
+    }
+    resp = requests.get(service_requests_url, headers=headers, params=params)
+    print(f"[INFO] Requesting: {service_requests_url} with {params}")
+    print(f"[INFO] Status: {resp.status_code}")
+    try:
+        print(f"[INFO] Response: {resp.json()}")
+    except Exception as e:
+        print(f"[ERROR] Could not parse JSON: {e}")
+    
+    scheduled = []
+    unscheduled = []
+    
+    if resp.status_code == 200:
+        bundle = resp.json()
+        for entry in bundle.get("entry", []):
+            sr = entry["resource"]
+            occurrence = sr.get("occurrenceDateTime") or sr.get("occurrencePeriod") or sr.get("occurrenceTiming")
+            record = {
+                "status": sr.get("status"),
+                "category": sr.get("category", [{}])[0].get("text"),
+                "code": sr.get("code", {}).get("text"),
+                "scheduled": occurrence,
+                "authoredOn": sr.get("authoredOn"),
+                "requester": sr.get("requester", {}).get("display"),
+                "notes": [note.get("text") for note in sr.get("note", [])]
+            }
+            if occurrence:
+                scheduled.append(record)
+            else:
+                unscheduled.append(record)
+        summary["scheduled_consults"] = scheduled
+        summary["unscheduled_consults"] = unscheduled
+    else:
+        print(f"[ERROR] Failed to fetch ServiceRequest resource: {resp.text}")
+
     print(f"[SUMMARY] Final summary for {icn}: {json.dumps(summary, indent=2)}")
     return summary
 
