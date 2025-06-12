@@ -11,9 +11,10 @@ import threading
 # =========================
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "your-dev-secret-key")
+app.config['SESSION_COOKIE_SAMESITE'] = "None"
+app.config['SESSION_COOKIE_SECURE'] = True
 CORS(app)  # Enable CORS for all routes
-
-app.secret_key = os.urandom(24)
 
 # OAuth2 credentials and API endpoints
 CLIENT_ID = "0oa13xn4aj5jvYcz62p8"
