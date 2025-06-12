@@ -474,8 +474,8 @@ input[type="date"]:focus {
 @media (max-width: 600px) {
     .container {
         display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
+        width: 94vw !important;
+        max-width: 94vw !important;
         min-width: 0 !important;
         padding: 8px 2vw !important;
         margin: 8px 0 !important;
@@ -491,7 +491,7 @@ input[type="date"]:focus {
     .veteran-checklist,
     .centered-checklist {
         min-width: 0 !important;
-        max-width: 100% !important;
+        max-width: 90% !important;
         box-sizing: border-box !important;
     }
     .global-top-bar {
@@ -528,7 +528,7 @@ input[type="date"]:focus {
         justify-content: flex-start !important;
     }
     .button-green, .button-red, .button-link {
-        width: 94vw !important;      /* Not 100%, so there's space on the sides */
+        width: 90% !important;      /* Not 100%, so there's space on the sides */
         max-width: 400px;            /* Prevents buttons from being too wide on tablets */
         margin: 8px auto !important; /* Center and add vertical space */
         font-size: 1.12em !important;
@@ -547,7 +547,7 @@ input[type="date"]:focus {
     #filterInput,
     select,
     input[type="date"] {
-        width: 100% !important;
+        width: 90% !important;
         min-width: 0 !important;
         font-size: 1.08em !important;
         box-sizing: border-box;
@@ -571,7 +571,7 @@ input[type="date"]:focus {
         background: #f4f8fb;
     }
     #veteranTable {
-        width: 100% !important;
+        width: 90% !important;
         display: block;
         overflow-x: auto;
         font-size: 1.05em;
