@@ -117,6 +117,21 @@ h2 {
     margin-top: 0;
 }
 
+/* Button row styling for desktop */
+.button-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.button-divider {
+    border-left: 1px solid #ccc;
+    height: 28px;
+    margin: 0 12px;
+    display: inline-block;
+}
+
 /* Portal Links */
 .portal-links {
     margin-top: 20px;
@@ -480,10 +495,22 @@ input[type="date"]:focus {
         padding: 0 2px;
     }
     .global-top-bar {
-        font-size: 1.1em;
-        padding: 10px 0;
-        flex-direction: column;
-        gap: 6px;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        font-size: 1.05em !important;
+        padding: 8px 0 !important;
+        gap: 2px !important;
+    }
+    .top-bar-link, .portal-name {
+        font-size: 1.05em !important;
+        margin: 0 !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100%;
+        text-align: center !important;
+        display: block !important;
     }
 }
 
@@ -494,12 +521,24 @@ input[type="date"]:focus {
         gap: 10px !important;
         align-items: stretch !important;
     }
+    .button-row {
+        flex-direction: column !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+        justify-content: flex-start !important;
+    }
     .button-green, .button-red, .button-link {
-        width: 100% !important;
-        min-width: 0 !important;
-        font-size: 1.15em !important;
-        margin: 6px 0 !important;
+        width: 94vw !important;      /* Not 100%, so there's space on the sides */
+        max-width: 400px;            /* Prevents buttons from being too wide on tablets */
+        margin: 8px auto !important; /* Center and add vertical space */
+        font-size: 1.12em !important;
         box-sizing: border-box;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+        display: block;
+    }
+    .button-divider {
+        display: none !important;
     }
 }
 
