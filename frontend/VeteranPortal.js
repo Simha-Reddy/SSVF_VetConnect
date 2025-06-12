@@ -245,3 +245,143 @@ function buildPatientInfoHTML(data) {
         </div>
     `;
 }
+
+
+// Copy to clipboard function for demo table
+function copyToClipboard(text, el) {
+    navigator.clipboard.writeText(text).then(() => {
+        el.style.color = "#43a047";
+        el.title = "Copied!";
+        setTimeout(() => {
+            el.style.color = "#205493";
+            el.title = "Copy";
+        }, 1200);
+    });
+}
+
+// Render checklist HTML (reuse this in both flex and centered modes)
+function getChecklistHTML() {
+    return `
+    <div class="veteran-checklist">
+        <h2 style="color:#205493; margin-top:0; margin-bottom:18px;">Veteran Health Care Connection Checklist</h2>
+        <p style="font-size:1.08em; margin-bottom:18px;">
+            <strong>Ask your SSVF Case Manager for assistance. They're here to help!</strong>
+        </p>
+        <div style="margin-bottom: 10px;">
+            <details>
+                <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 1: Get a VA Appointment</summary>
+                <ul style="margin-top:8px;">
+                    <li>Contact your Primary Care Clinic or local VA.</li>
+                    <li>Ask about VA Telehealth options:
+                        <ul>
+                            <li><b>VA Video Connect (VVC)</b> or <b>Clinical Video Telehealth (CVT)</b> lets you see your doctor by phone, tablet, or computer.</li>
+                            <li>Telehealth can help you avoid travel, save time, and get care quickly.</li>
+                            <li>
+                                See the 
+                                <a href="telehealth_quick_card.html" target="_blank" style="color:#205493; text-decoration:underline;">
+                                    Telehealth Quick Card
+                                </a> 
+                                for tips on using VA Telehealth and getting connected.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </details>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <details>
+                <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 2: Access Physical and Mental Healthcare</summary>
+                <ul style="margin-top:8px;">
+                    <li>Secure a Primary Care Provider (PCP) through your Patient Aligned Care Team (PACT).</li>
+                    <li>Work with your case manager or healthcare navigator if you have difficulty accessing care.</li>
+                    <li>Schedule needed care:
+                        <ul>
+                            <li>Primary Care</li>
+                            <li>Mental Health</li>
+                            <li>Substance Use Treatment</li>
+                            <li>Prescriptions</li>
+                            <li>Follow-up Appointments</li>
+                        </ul>
+                    </li>
+                </ul>
+            </details>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <details>
+                <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 3: Include Your Healthcare Navigator in your VA Care Team</summary>
+                <ul style="margin-top:8px;">
+                    <li>Let your VA team know if you have a healthcare navigator or case manager helping you.</li>
+                </ul>
+            </details>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <details>
+                <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 4: Transportation Help</summary>
+                <ul style="margin-top:8px;">
+                    <li>Ask the VA or navigator about:
+                        <ul>
+                            <li>Travel pay</li>
+                            <li>VA shuttles</li>
+                            <li>Veteran service organization rides</li>
+                        </ul>
+                    </li>
+                </ul>
+            </details>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <details>
+                <summary style="font-weight:bold; font-size:1.08em; color:#205493;">Step 5: Access Additional Support</summary>
+                <ul style="margin-top:8px;">
+                    <li>Ask the healthcare navigator or VA social worker to connect you to:
+                        <ul>
+                            <li>Dental and vision care</li>
+                            <li>Vocational rehabilitation</li>
+                            <li>Benefits and claims assistance</li>
+                            <li>Legal and advocacy support</li>
+                        </ul>
+                    </li>
+                </ul>
+            </details>
+        </div>
+        <div style="margin-top:18px;">
+            <h3 style="margin-bottom:8px; color:#205493;">Key Phone Numbers</h3>
+            <ul style="list-style:none; padding-left:0; font-size:1.08em;">
+                <li><b>VA Benefits / Enrollment:</b> 1-877-222-VETS (8387)</li>
+                <li><b>Veterans Crisis Line:</b> 988, then press 1</li>
+                <li><b>SSVF Health Care Navigator (local contact):</b> <span style="color:#888;">_____________</span></li>
+                <li><b>Transportation Help (local contact):</b> <span style="color:#888;">______________</span></li>
+            </ul>
+        </div>
+    </div>
+    `;
+}
+
+// This function will be called by your app.js updateUI
+function renderMainContent(patientInfoHTML) {
+    const mainContent = document.getElementById('main-content');
+    if (patientInfoHTML && patientInfoHTML.trim() !== '') {
+        // Show patient info and checklist side by side
+        mainContent.innerHTML = `
+            <div class="main-flex">
+                <div>${patientInfoHTML}</div>
+                <div>${getChecklistHTML()}</div>
+            </div>
+        `;
+    } else {
+        // Show checklist centered and full width
+        mainContent.innerHTML = `
+            <div class="centered-checklist">
+                ${getChecklistHTML()}
+            </div>
+        `;
+    }
+}
+
+// On page load, show only the checklist (no patient info yet)
+renderMainContent('');
+
+// In your app.js, after fetching and building the patient info HTML, call:
+// renderMainContent(patientInfoHTML);
+
+// Optionally, you can expose renderMainContent globally if needed:
+window.renderMainContent = renderMainContent;
