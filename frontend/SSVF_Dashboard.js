@@ -120,64 +120,64 @@ function renderTable(veterans) {
     const tbody = document.getElementById('veteranTable').querySelector('tbody');
     tbody.innerHTML = '';
     veterans.forEach((vet, idx) => {
-        // Fetch case notes for each veteran
         fetch(`/api/case_notes/${vet.id}`)
             .then(r => r.json())
             .then(notes => {
+                // Main row (always visible)
                 const tr = document.createElement('tr');
-                let ssnLast4 = '';
-                if (vet.ssn && vet.ssn.length >= 4) {
-                    ssnLast4 = vet.ssn.slice(-4);
-                }
+                tr.className = 'main-row';
                 tr.innerHTML = `
-                    <td class="name-cell">
-                        ${
-                            vet.token_status === "missing"
+                    <td class="name-cell" style="cursor:pointer;">
+                        ${vet.token_status === "missing"
                             ? '<span class="token-expired-indicator" title="Consent expired or revoked"></span>'
                             : ''
                         }
-                        ${vet.name || ''}
+                        <span onclick="toggleDetails(${idx}, cachedVeterans[${idx}])">${vet.name || ''}</span>
                     </td>
-                    <td>${ssnLast4}</td>
-                    <td>${vet.age || ''}</td>
-                    <td>
-                        ${
-                            (vet.care_teams && vet.care_teams.length > 0)
-                            ? "Yes"
-                            : `None found. <a href="https://eauth.va.gov/accessva/?cspSelectFor=https%3A%2F%2Fwww.my.vaemcc.va.gov%2FSQUARES&ForceAuthn=false" target="_blank">Check Eligibility</a>`
-                        }
+                    <td class="hide-mobile">${vet.ssn && vet.ssn.length >= 4 ? vet.ssn.slice(-4) : ''}</td>
+                    <td class="hide-mobile">${vet.age || ''}</td>
+                    <td class="hide-mobile">
+                        ${(vet.care_teams && vet.care_teams.length > 0) ? "Yes" : "None"}
                     </td>
-                    <td>
+                    <td class="hide-mobile">
                         <select>
                             ${livingOptions.map(opt => `<option value="${opt}"${notes.living_situation === opt ? ' selected' : ''}>${opt}</option>`).join('')}
                         </select>
                     </td>
-                    <td>
+                    <td class="hide-mobile">
                         <input type="date" value="${notes.last_contact || ''}">
                     </td>
-                    <td>
+                    <td class="hide-mobile">
                         <span class="notes-preview clickable" title="${notes.case_notes || ''}" onclick="openNotesModal('${vet.id}', '${notes.case_notes || ''}', this.parentElement.parentElement.querySelector('select').value, this.parentElement.parentElement.querySelector('input').value)">
                             ${notes.case_notes && notes.case_notes.length > 0 ? (notes.case_notes.length > 60 ? notes.case_notes.slice(0, 60) + '…' : notes.case_notes) : '—'}
                         </span>
                     </td>
-                    <td>${(vet.upcoming_appointments && vet.upcoming_appointments.length > 0) ? new Date(vet.upcoming_appointments[0].date).toLocaleString() : ''}</td>
-                    <td>
+                    <td class="hide-mobile">${(vet.upcoming_appointments && vet.upcoming_appointments.length > 0) ? new Date(vet.upcoming_appointments[0].date).toLocaleString() : ''}</td>
+                    <td class="hide-mobile">
                         <button class="save-btn button-green" onclick="saveNotes('${vet.id}', this)">Save</button>
                         <span class="save-success" style="display:none;"></span>
                     </td>
-                    <td><button class="button-green" onclick="toggleDetails(${idx}, cachedVeterans[${idx}])">Details</button></td>
-                    <td><button class="button-green" onclick="reassignVeteran('${vet.id}')">Reassign</button></td>
+                    <td class="hide-mobile"><button class="button-green" onclick="toggleDetails(${idx}, cachedVeterans[${idx}])">Details</button></td>
+                    <td class="hide-mobile"><button class="button-green" onclick="reassignVeteran('${vet.id}')">Reassign</button></td>
                 `;
                 tbody.appendChild(tr);
 
-                // Details row (initially hidden)
+                // Details row (hidden by default, shown on click)
                 const detailsTr = document.createElement('tr');
                 detailsTr.className = 'expand-row';
                 detailsTr.id = `details-row-${idx}`;
                 detailsTr.style.display = 'none';
                 const detailsTd = document.createElement('td');
-                detailsTd.colSpan = 10;
-                detailsTd.innerHTML = renderDetails(vet);
+                detailsTd.colSpan = 11;
+                detailsTd.innerHTML = `
+                    <div class="mobile-details">
+                        ${renderDetails(vet)}
+                        <div style="margin-top:12px;">
+                            <button class="button-green" onclick="reassignVeteran('${vet.id}')">Reassign</button>
+                            <button class="button-green" onclick="openNotesModal('${vet.id}', '${notes.case_notes || ''}', '${notes.living_situation || ''}', '${notes.last_contact || ''}')">Edit Notes</button>
+                        </div>
+                    </div>
+                `;
                 detailsTr.appendChild(detailsTd);
                 tbody.appendChild(detailsTr);
             });

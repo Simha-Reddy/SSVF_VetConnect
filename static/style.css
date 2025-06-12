@@ -440,48 +440,157 @@ input[type="date"]:focus {
     position: relative;
 }
 
-/* Responsive Design */
-@media (max-width: 900px) {
-    .container {
-        padding: 18px 6px;
-        max-width: 99vw;
+/* === MOBILE FRIENDLY CSS === */
+
+/* General font scaling for mobile */
+@media (max-width: 600px) {
+    html, body, input, select, button, textarea {
+        font-size: 1.15em !important;
     }
-    table, th, td {
-        font-size: 0.97em;
+    h1, h2, h3 {
+        font-size: 1.2em !important;
     }
-    #filterInput {
-        width: 70%;
-    }
-    .main-flex {
-        flex-direction: column;
-        gap: 0;
+    .subtitle {
+        font-size: 1em !important;
     }
 }
 
+/* Container and layout adjustments */
 @media (max-width: 600px) {
     .container {
         padding: 8px 2px;
+        max-width: 100vw;
+        min-width: 0;
     }
-    table, th, td {
-        font-size: 0.93em;
-        padding: 7px 4px;
+    .main-flex {
+        flex-direction: column !important;
+        gap: 0 !important;
+        padding: 10px 4px !important;
+    }
+    .main-flex > div {
+        min-width: 0 !important;
+    }
+    .veteran-checklist {
+        padding: 12px 4px !important;
+        font-size: 1.08em !important;
+        max-width: 100vw;
+    }
+    .centered-checklist {
+        margin-top: 18px;
+        padding: 0 2px;
     }
     .global-top-bar {
         font-size: 1.1em;
         padding: 10px 0;
+        flex-direction: column;
+        gap: 6px;
     }
+}
 
-    /* Responsive Table for Phones */
+/* Responsive buttons: stack and fill width */
+@media (max-width: 600px) {
+    .container > div[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+    }
+    .button-green, .button-red, .button-link {
+        width: 100% !important;
+        min-width: 0 !important;
+        font-size: 1.15em !important;
+        margin: 6px 0 !important;
+        box-sizing: border-box;
+    }
+}
+
+/* Inputs and selects full width */
+@media (max-width: 600px) {
+    #filterInput,
+    select,
+    input[type="date"] {
+        width: 100% !important;
+        min-width: 0 !important;
+        font-size: 1.08em !important;
+        box-sizing: border-box;
+    }
+}
+
+/* Table: show only name column, make name interactive */
+@media (max-width: 600px) {
     #veteranTable th:not(:first-child),
     #veteranTable td:not(:first-child) {
-        display: none; /* Hide all columns except the first (Name) */
+        display: none !important; /* Hide all columns except the first (Name) */
     }
-
     #veteranTable th:first-child,
     #veteranTable td:first-child {
-        text-align: left; /* Align the Name column to the left */
-        cursor: pointer; /* Indicate interactivity */
-        color: #3498db; /* Highlight the clickable name */
-        text-decoration: underline; /* Underline to indicate interactivity */
+        text-align: left;
+        cursor: pointer;
+        color: #3498db;
+        text-decoration: underline;
+        font-size: 1.12em;
+        font-weight: 600;
+        background: #f4f8fb;
+    }
+    #veteranTable {
+        width: 100% !important;
+        display: block;
+        overflow-x: auto;
+        font-size: 1.05em;
+    }
+}
+
+/* Details card for mobile (if you use expandable rows/cards) */
+@media (max-width: 600px) {
+    .mobile-details {
+        background: #f6f8fa;
+        border-radius: 10px;
+        padding: 12px 8px;
+        font-size: 1.08em;
+        margin: 8px 0;
+        box-shadow: 0 2px 8px #0001;
+    }
+    .main-row .name-cell {
+        font-size: 1.15em;
+        font-weight: 600;
+        color: #3498db;
+        text-decoration: underline;
+    }
+}
+
+/* Modal: fit to screen */
+@media (max-width: 600px) {
+    .modal-content {
+        min-width: 0 !important;
+        width: 98vw !important;
+        max-width: 99vw !important;
+        padding: 10px 2vw !important;
+    }
+}
+
+/* Login form: stack fields */
+@media (max-width: 600px) {
+    #loginForm {
+        max-width: 99vw;
+        padding: 0 2vw;
+    }
+}
+
+/* Miscellaneous: reduce padding/margins for small screens */
+@media (max-width: 600px) {
+    .header-bar {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+    .header-title {
+        font-size: 1.5em !important;
+    }
+    .portal-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .modal-actions {
+        flex-direction: column;
+        gap: 8px;
     }
 }
