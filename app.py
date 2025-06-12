@@ -51,12 +51,12 @@ def save_case_notes(notes):
 # Serve index.html at root
 @app.route("/")
 def index():
-    return send_from_directory('../frontend', 'index.html')
+    return send_from_directory('frontend', 'index.html')
 
 # Serve any other frontend file (e.g., SSVF_Dashboard.html, VeteranPortal.html)
 @app.route('/<path:filename>')
 def serve_static(filename):
-    return send_from_directory('../frontend', filename)
+    return send_from_directory('frontend', filename)
 
 @app.route("/case_manager_login", methods=["POST"])
 def case_manager_login():
@@ -169,13 +169,13 @@ def oauth_callback():
 
 @app.route("/approval-success")
 def approval_success():
-    return send_from_directory('../frontend', 'approval_success.html')
+    return send_from_directory('frontend', 'approval_success.html')
 
 @app.route("/dashboard")
 def dashboard():
     if "user" not in session:
         return redirect("/login")
-    return send_from_directory('../frontend', 'SSVF_Dashboard.html')
+    return send_from_directory('frontend', 'SSVF_Dashboard.html')
 
 @app.route("/api/patient")
 def get_patient():
