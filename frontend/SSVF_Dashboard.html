@@ -213,6 +213,19 @@
             });
         }
 
+        // Format appointments
+        function formatAppt(appt) {
+            return `
+                <div style="margin-bottom:6px;">
+                    <strong>${appt.date ? new Date(appt.date).toLocaleString() : ''}</strong>
+                    ${appt.description ? ' - ' + appt.description : ''}
+                    ${appt.service_type ? ' (' + appt.service_type + ')' : ''}
+                    ${appt.reason ? ' [' + appt.reason + ']' : ''}
+                    ${appt.status ? ' <span style="color:#888;">[' + appt.status + ']</span>' : ''}
+                </div>
+            `;
+        }
+
         function renderDetails(vet) {
             let html = '<div style="padding:10px;">';
             if (vet.name) html += `<strong>Name:</strong> ${vet.name}<br>`;
@@ -260,18 +273,16 @@
                 });
             }
             if (vet.past_appointments && vet.past_appointments.length) {
-                html += `<strong>Past Appointments (6mo):</strong><ul>`;
+                html += `<strong>Past Appointments (6mo):</strong>`;
                 vet.past_appointments.forEach(appt => {
-                    html += `<li>${appt.date ? new Date(appt.date).toLocaleString() : ''} - ${appt.description || appt.service_type || appt.reason || ''} (${appt.status || ''})</li>`;
+                    html += formatAppt(appt);
                 });
-                html += `</ul>`;
             }
             if (vet.upcoming_appointments && vet.upcoming_appointments.length) {
-                html += `<strong>Upcoming Appointments:</strong><ul>`;
+                html += `<strong>Upcoming Appointments:</strong>`;
                 vet.upcoming_appointments.forEach(appt => {
-                    html += `<li>${appt.date ? new Date(appt.date).toLocaleString() : ''} - ${appt.description || appt.service_type || appt.reason || ''} (${appt.status || ''})</li>`;
+                    html += formatAppt(appt);
                 });
-                html += `</ul>`;
             }
             if (vet.consults && vet.consults.length) {
                 html += `<strong>Active Consults/Referrals:</strong><ul>`;
