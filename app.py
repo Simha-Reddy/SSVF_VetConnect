@@ -17,9 +17,9 @@ app.config['SESSION_COOKIE_SECURE'] = True
 CORS(app)  # Enable CORS for all routes
 
 # OAuth2 credentials and API endpoints
-CLIENT_ID = "0oa13xn4aj5jvYcz62p8"
-CLIENT_SECRET = "m9RtrL7ji4JNjtQdq1NbOg0YAUKMwREcv_PShu6WJFcBD4BXg2MKZ6UONPnzbuKQ"
-REDIRECT_URI = "http://127.0.0.1:5000/oauth/callback"
+CLIENT_ID = os.environ.get("CLIENT_ID", "0oa14yyj478KHYYYC2p8")
+CLIENT_SECRET = os.environ.get("CLIENT_SECRET", "pqmKTPrFTbTCwUQWGbVGjSY0YgIhUaol15FdYBva8NsajcNjfDEZkel2lz5AxYD3")
+REDIRECT_URI = os.environ.get("REDIRECT_URI", "https://ssvf-vet-connect-7eb35b893d8e.herokuapp.com/oauth/callback")
 AUTH_URL = "https://sandbox-api.va.gov/oauth2/health/v1/authorization"
 TOKEN_URL = "https://sandbox-api.va.gov/oauth2/health/v1/token"
 FHIR_API_BASE = "https://sandbox-api.va.gov/services/fhir/v0/r4"
