@@ -255,22 +255,36 @@ function renderDetails(vet) {
             html += formatAppt(appt);
         });
     }
-    // Active consults/referrals
-    if (vet.consults && vet.consults.length) {
-        html += `<strong>Active Consults/Referrals:</strong><ul>`;
-        vet.consults.forEach(c => {
-            html += `<li>${c.description || ''} (${c.status || ''})</li>`;
+
+    // Scheduled consults/orders
+    if (vet.scheduled_consults && vet.scheduled_consults.length) {
+        html += `<strong>Scheduled Consults/Orders:</strong><ul>`;
+        vet.scheduled_consults.forEach(c => {
+            html += `<li>
+                ${c.code || ''} 
+                ${c.scheduled ? `— <b>Scheduled:</b> ${typeof c.scheduled === 'string' ? c.scheduled : JSON.stringify(c.scheduled)}` : ''}
+                ${c.requester ? `— <b>Ordered by:</b> ${c.requester}` : ''}
+                ${c.status ? `— <b>Status:</b> ${c.status}` : ''}
+                ${c.notes && c.notes.length ? `<br><i>Notes:</i> ${c.notes.join('; ')}` : ''}
+            </li>`;
         });
         html += `</ul>`;
     }
-    // Pending radiology orders
-    if (vet.radiology_orders && vet.radiology_orders.length) {
-        html += `<strong>Pending Radiology Orders:</strong><ul>`;
-        vet.radiology_orders.forEach(r => {
-            html += `<li>${r.description || ''} (${r.status || ''})</li>`;
+    // Unscheduled consults/orders
+    if (vet.unscheduled_consults && vet.unscheduled_consults.length) {
+        html += `<strong>Unscheduled/Pending Consults/Orders:</strong><ul>`;
+        vet.unscheduled_consults.forEach(c => {
+            html += `<li>
+                ${c.code || ''} 
+                ${c.authoredOn ? `— <b>Ordered on:</b> ${c.authoredOn}` : ''}
+                ${c.requester ? `— <b>Ordered by:</b> ${c.requester}` : ''}
+                ${c.status ? `— <b>Status:</b> ${c.status}` : ''}
+                ${c.notes && c.notes.length ? `<br><i>Notes:</i> ${c.notes.join('; ')}` : ''}
+            </li>`;
         });
         html += `</ul>`;
     }
+    
     html += '</div>';
     return html;
 }
