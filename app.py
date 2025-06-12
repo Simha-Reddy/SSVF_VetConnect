@@ -6,12 +6,16 @@ from flask_cors import CORS
 from datetime import datetime, timedelta
 import threading
 
+# =========================
+# Flask App Setup
+# =========================
+
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 app.secret_key = os.urandom(24)
 
-# OAuth2 credentials from sandboxKey.txt
+# OAuth2 credentials and API endpoints
 CLIENT_ID = "0oa13xn4aj5jvYcz62p8"
 CLIENT_SECRET = "m9RtrL7ji4JNjtQdq1NbOg0YAUKMwREcv_PShu6WJFcBD4BXg2MKZ6UONPnzbuKQ"
 REDIRECT_URI = "http://127.0.0.1:5000/oauth/callback"
@@ -23,18 +27,25 @@ TOKEN_DB = "tokens.json"
 CASE_NOTES_DB = "case_notes.json"
 case_notes_lock = threading.Lock()
 
+# =========================
+# Utility Functions
+# =========================
+
 def load_tokens():
+    """Load tokens from the tokens.json file."""
     if not os.path.exists(TOKEN_DB):
         return {}
     with open(TOKEN_DB, "r") as f:
         return json.load(f)
 
 def save_tokens(tokens):
+    """Save tokens to the tokens.json file."""
     print("Saving tokens to tokens.json")
     with open(TOKEN_DB, "w") as f:
         json.dump(tokens, f)
 
 def load_case_notes():
+    """Load case notes from the case_notes.json file."""
     if not os.path.exists(CASE_NOTES_DB):
         return {}
     with open(CASE_NOTES_DB, "r") as f:
@@ -44,22 +55,60 @@ def load_case_notes():
         return json.loads(content)
 
 def save_case_notes(notes):
+    """Save case notes to the case_notes.json file."""
     with case_notes_lock:
         with open(CASE_NOTES_DB, "w") as f:
             json.dump(notes, f)
 
-# Serve index.html at root
+def load_data():
+    """Load agency/case manager/veteran assignments from assignments.json."""
+    with open("./assignments.json", "r") as file:
+        return json.load(file)
+
+def authorize_agency(agency_id):
+    """Check if the logged-in user is authorized for the given agency."""
+    user = session.get("user")
+    if not user or user["agency_id"] != agency_id:
+        return False
+    return True
+
+def refresh_access_token(refresh_token):
+    """Refresh an expired OAuth access token using the refresh token."""
+    data = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+    }
+    resp = requests.post(TOKEN_URL, data=data)
+    if resp.status_code == 200:
+        return resp.json()
+    return None
+
+# =========================
+# Static & Frontend Routes
+# =========================
+
 @app.route("/")
 def index():
+    """Serve the main index.html page."""
     return send_from_directory('frontend', 'index.html')
 
-# Serve any other frontend file (e.g., SSVF_Dashboard.html, VeteranPortal.html)
 @app.route('/<path:filename>')
 def serve_static(filename):
+    """Serve any other frontend file (HTML, JS, etc.)."""
     return send_from_directory('frontend', filename)
+
+# =========================
+# Authentication & Session
+# =========================
 
 @app.route("/case_manager_login", methods=["POST"])
 def case_manager_login():
+    """
+    Handle case manager login.
+    Expects JSON with agency_id, username, and password.
+    """
     data = request.json
     agency_id = data.get("agency_id")
     if not agency_id or not agency_id.isdigit():
@@ -71,15 +120,11 @@ def case_manager_login():
     if not agency_id or not username or not password:
         return jsonify({"error": "Missing required fields"}), 400
 
-    # Load data from JSON
     agencies = load_data()
-
-    # Find the agency
     agency = next((a for a in agencies if a["id"] == agency_id), None)
     if not agency:
         return jsonify({"error": "Invalid agency"}), 400
 
-    # Find the case manager
     case_manager = next(
         (cm for cm in agency["case_managers"]
          if cm["username"].lower() == username.lower() and cm["password"] == password),
@@ -99,6 +144,7 @@ def case_manager_login():
 
 @app.route("/api/case_manager_session", methods=["GET"])
 def get_case_manager_session():
+    """Return the current logged-in case manager's session info."""
     user = session.get("user")
     if not user:
         return jsonify({"error": "Not logged in"}), 401
@@ -108,8 +154,16 @@ def get_case_manager_session():
         "username": user["username"]
     })
 
+# =========================
+# OAuth2 Login & Callback
+# =========================
+
 @app.route("/login")
 def login():
+    """
+    Start OAuth2 login flow for Veterans.
+    Stores 'next' URL in session if provided.
+    """
     next_url = request.args.get("next")
     if next_url:
         session["next"] = next_url
@@ -126,6 +180,10 @@ def login():
 
 @app.route("/oauth/callback")
 def oauth_callback():
+    """
+    OAuth2 callback endpoint.
+    Exchanges code for tokens and stores them by ICN (patient id).
+    """
     print("Callback query parameters:", dict(request.args))
     code = request.args.get("code")
     if not code:
@@ -143,7 +201,7 @@ def oauth_callback():
     token_data = resp.json()
     access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
-    icn = token_data.get("patient")  # <-- Get ICN from token response!
+    icn = token_data.get("patient")  # Patient identifier
 
     print(f"OAuth callback ICN: {icn}")
     print(f"Token data: {token_data}")
@@ -169,18 +227,27 @@ def oauth_callback():
 
 @app.route("/approval-success")
 def approval_success():
+    """Serve the approval success page after OAuth."""
     return send_from_directory('frontend', 'approval_success.html')
+
+# =========================
+# Dashboard & Patient Data
+# =========================
 
 @app.route("/dashboard")
 def dashboard():
+    """Serve the Case Manager Dashboard if logged in."""
     if "user" not in session:
         return redirect("/login")
     return send_from_directory('frontend', 'SSVF_Dashboard.html')
 
 @app.route("/api/patient")
 def get_patient():
+    """
+    Return summary patient info for the given patient id (ICN).
+    Uses session ICN if not provided.
+    """
     patient_id = request.args.get("id")
-    # Use session ICN if not provided or if 'session' is passed
     if not patient_id or patient_id == "session":
         patient_id = session.get("icn")
     if not patient_id:
@@ -192,12 +259,13 @@ def get_patient():
         return jsonify({"error": "Not authorized for this patient"}), 403
 
     access_token = token_info["access_token"]
-
-    # Use the summary function instead of returning the raw FHIR resource
     summary = get_patient_summary(patient_id, access_token)
     return jsonify(summary)
 
 def get_patient_summary(icn, access_token):
+    """
+    Build a summary of patient info, appointments, and care teams from FHIR API.
+    """
     headers = {"Authorization": f"Bearer {access_token}"}
     summary = {"id": icn}
 
@@ -217,14 +285,14 @@ def get_patient_summary(icn, access_token):
         if "name" in patient and len(patient["name"]) > 0:
             n = patient["name"][0]
             summary["name"] = f"{n.get('given', [''])[0]} {n.get('family', '')}".strip()
-        # Age
+        # Age and DOB
         if "birthDate" in patient:
             try:
                 birth = datetime.strptime(patient["birthDate"], "%Y-%m-%d")
                 summary["age"] = int((datetime.now() - birth).days / 365.25)
             except Exception:
                 pass
-            summary["dob"] = patient["birthDate"]  # <-- Add this line
+            summary["dob"] = patient["birthDate"]
         # Contact info
         phones = [tele["value"] for tele in patient.get("telecom", []) if tele.get("system") == "phone"]
         emails = [tele["value"] for tele in patient.get("telecom", []) if tele.get("system") == "email"]
@@ -238,8 +306,7 @@ def get_patient_summary(icn, access_token):
             summary["emails"] = emails
         if address:
             summary["address"] = address
-
-        # Social Security Number (SSN)
+        # SSN
         ssn = None
         for identifier in patient.get("identifier", []):
             type_field = identifier.get("type", {})
@@ -255,7 +322,6 @@ def get_patient_summary(icn, access_token):
                 break
         if ssn:
             summary["ssn"] = ssn
-
     else:
         print(f"[ERROR] Failed to fetch Patient resource: {resp.text}")
 
@@ -325,9 +391,16 @@ def get_patient_summary(icn, access_token):
     print(f"[SUMMARY] Final summary for {icn}: {json.dumps(summary, indent=2)}")
     return summary
 
-# Update your /api/veterans route:
+# =========================
+# Veteran Assignment & Management
+# =========================
+
 @app.route("/api/veterans", methods=["GET"])
 def get_veterans():
+    """
+    Return all veterans for the agency, or for a specific case manager.
+    Used for dashboard population and filtering.
+    """
     user = session.get("user")
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
@@ -337,7 +410,7 @@ def get_veterans():
     if not agency:
         return jsonify({"error": "Invalid agency"}), 400
 
-    # --- ADD THIS BLOCK ---
+    # Return all veterans for the agency
     if request.args.get("all") == "true":
         all_veterans = []
         for cm in agency["case_managers"]:
@@ -346,14 +419,13 @@ def get_veterans():
                 v_copy["case_manager_id"] = cm["id"]
                 all_veterans.append(v_copy)
         return jsonify(all_veterans)
-    # --- END BLOCK ---
 
+    # Return veterans for a specific case manager
     case_manager_id = request.args.get("case_manager_id")
     if case_manager_id:
         case_manager = next((cm for cm in agency["case_managers"] if str(cm["id"]) == str(case_manager_id)), None)
         if not case_manager:
             return jsonify({"error": "Invalid case manager"}), 400
-        # Add case_manager_id to each veteran for frontend filtering
         veterans = []
         for v in case_manager["veterans"]:
             v_copy = v.copy()
@@ -372,51 +444,11 @@ def get_veterans():
         veterans.append(v_copy)
     return jsonify(veterans)
 
-@app.route("/api/revoke", methods=["POST"])
-def revoke_access():
-    icn = session.get("icn")
-    if icn:
-        tokens = load_tokens()
-        tokens.pop(icn, None)
-        save_tokens(tokens)
-    session.pop("access_token", None)
-    session.pop("icn", None)
-    return jsonify({"message": "Access revoked."})
-
-@app.route("/api/case_notes", methods=["POST"])
-def save_case_notes_api():
-    data = request.json
-    icn = data.get("icn")
-    if not icn:
-        return jsonify({"error": "Missing ICN"}), 400
-    notes = load_case_notes()
-    notes[icn] = {
-        "living_situation": data.get("living_situation"),
-        "last_contact": data.get("last_contact"),
-        "case_notes": data.get("case_notes")
-    }
-    save_case_notes(notes)
-    return jsonify({"success": True})
-
-@app.route("/api/case_notes/<icn>")
-def get_case_notes_api(icn):
-    notes = load_case_notes()
-    return jsonify(notes.get(icn, {}))
-
-def refresh_access_token(refresh_token):
-    data = {
-        "grant_type": "refresh_token",
-        "refresh_token": refresh_token,
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-    }
-    resp = requests.post(TOKEN_URL, data=data)
-    if resp.status_code == 200:
-        return resp.json()
-    return None
-
 @app.route("/api/reassign_veteran", methods=["POST"])
 def reassign_veteran():
+    """
+    Reassign a veteran to a new case manager within the same agency.
+    """
     user = session.get("user")
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
@@ -428,15 +460,11 @@ def reassign_veteran():
     if not veteran_id or not new_case_manager_id:
         return jsonify({"error": "Missing required fields"}), 400
 
-    # Load data from JSON
     agencies = load_data()
-
-    # Find the agency
     agency = next((a for a in agencies if a["id"] == user["agency_id"]), None)
     if not agency:
         return jsonify({"error": "Invalid agency"}), 400
 
-    # Ensure the new case manager belongs to the same agency
     new_case_manager = next(
         (cm for cm in agency["case_managers"] if cm["id"] == new_case_manager_id),
         None
@@ -448,8 +476,8 @@ def reassign_veteran():
     for cm in agency["case_managers"]:
         veteran = next((v for v in cm["veterans"] if v["id"] == veteran_id), None)
         if veteran:
-            cm["veterans"].remove(veteran)  # Remove Veteran from current case manager
-            new_case_manager["veterans"].append(veteran)  # Add Veteran to new case manager
+            cm["veterans"].remove(veteran)
+            new_case_manager["veterans"].append(veteran)
             break
     else:
         return jsonify({"error": "Veteran not found"}), 404
@@ -462,6 +490,10 @@ def reassign_veteran():
 
 @app.route("/api/assign_veteran", methods=["POST"])
 def assign_veteran():
+    """
+    Assign a veteran to a case manager.
+    Used when a veteran approves access via the portal.
+    """
     data = request.json
     agency_id = data.get("agency_id")
     case_manager_id = data.get("case_manager_id")
@@ -545,23 +577,67 @@ def assign_veteran():
 
     return jsonify({"success": True, "message": "Veteran assigned successfully"})
 
-def authorize_agency(agency_id):
-    user = session.get("user")
-    if not user or user["agency_id"] != agency_id:
-        return False
-    return True
+# =========================
+# Case Notes API
+# =========================
 
-def load_data():
-    with open("./assignments.json", "r") as file:
-        return json.load(file)
+@app.route("/api/case_notes", methods=["POST"])
+def save_case_notes_api():
+    """
+    Save or update case notes for a veteran.
+    """
+    data = request.json
+    icn = data.get("icn")
+    if not icn:
+        return jsonify({"error": "Missing ICN"}), 400
+    notes = load_case_notes()
+    notes[icn] = {
+        "living_situation": data.get("living_situation"),
+        "last_contact": data.get("last_contact"),
+        "case_notes": data.get("case_notes")
+    }
+    save_case_notes(notes)
+    return jsonify({"success": True})
+
+@app.route("/api/case_notes/<icn>")
+def get_case_notes_api(icn):
+    """
+    Get case notes for a specific veteran (ICN).
+    """
+    notes = load_case_notes()
+    return jsonify(notes.get(icn, {}))
+
+# =========================
+# Consent/Token Revocation
+# =========================
+
+@app.route("/api/revoke", methods=["POST"])
+def revoke_access():
+    """
+    Revoke a veteran's consent/token (removes from tokens.json and session).
+    """
+    icn = session.get("icn")
+    if icn:
+        tokens = load_tokens()
+        tokens.pop(icn, None)
+        save_tokens(tokens)
+    session.pop("access_token", None)
+    session.pop("icn", None)
+    return jsonify({"message": "Access revoked."})
+
+# =========================
+# Agency & Case Manager Info
+# =========================
 
 @app.route("/api/agencies", methods=["GET"])
 def get_agencies():
+    """Return a list of all agencies (id and name only)."""
     agencies = load_data()
     return jsonify([{"id": a["id"], "name": a["name"]} for a in agencies])
 
 @app.route("/api/case_managers", methods=["GET"])
 def get_case_managers():
+    """Return all case managers for a given agency."""
     agency_id = request.args.get("agency_id")
     if not agency_id:
         return jsonify({"error": "Missing agency ID"}), 400
@@ -572,6 +648,10 @@ def get_case_managers():
         return jsonify({"error": "Invalid agency ID"}), 400
 
     return jsonify([{"id": cm["id"], "username": cm["username"]} for cm in agency["case_managers"]])
+
+# =========================
+# App Entry Point
+# =========================
 
 if __name__ == "__main__":
     app.run(debug=True)

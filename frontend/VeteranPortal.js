@@ -1,8 +1,17 @@
-// frontend/app.js
+// =========================
+// Veteran Portal JavaScript
+// =========================
 
+// --- API Base URL ---
 const apiUrl = 'http://127.0.0.1:5000/api'; // URL for the Flask backend
 
-// Function to fetch patient data from the backend
+// =========================
+// Data Fetching & UI Update
+// =========================
+
+/**
+ * Fetch patient data from the backend and update the UI.
+ */
 async function fetchPatientData() {
     try {
         const response = await fetch(`${apiUrl}/patient`);
@@ -16,14 +25,18 @@ async function fetchPatientData() {
     }
 }
 
-// Function to update the UI with patient data
+/**
+ * Update the UI with patient data.
+ * @param {Object} data - Patient data object from backend.
+ */
 function updateUI(data) {
     const patientInfoDiv = document.getElementById('patient-info');
     if (data.error) {
         patientInfoDiv.innerHTML = `<div style="color:red;">${data.error}</div>`;
         return;
     }
-    // Format appointments
+
+    // Helper: Format a single appointment as HTML
     function formatAppt(appt) {
         return `
             <div style="margin-bottom:6px;">
@@ -35,18 +48,8 @@ function updateUI(data) {
             </div>
         `;
     }
-    // Format care teams
-    function formatCareTeam(team) {
-        return `
-            <div style="margin-bottom:8px;">
-                <strong>Practitioner:</strong> ${team.practitioner || '—'}<br>
-                <strong>Organization:</strong> ${team.organization || '—'}<br>
-                <strong>Role:</strong> ${(team.role && team.role.length) ? team.role.join(', ') : '—'}<br>
-                <strong>Location(s):</strong> ${(team.locations && team.locations.length) ? team.locations.join(', ') : '—'}
-            </div>
-        `;
-    }
-    // Group care teams by location and make expandable
+
+    // Helper: Group care teams by location and render as expandable sections
     function renderCareTeamsExpandable(careTeams) {
         if (!careTeams || careTeams.length === 0) {
             return '<div style="color:#888;">None found.</div>';
@@ -80,6 +83,7 @@ function updateUI(data) {
         `).join('');
     }
 
+    // Main patient info HTML
     patientInfoDiv.innerHTML = `
         <div style="background:#f6f8fa; border-radius:8px; padding:20px; max-width:600px;">
             <h2 style="color:#205493; margin-top:0;">Your VA Profile</h2>
@@ -106,12 +110,20 @@ function updateUI(data) {
     `;
 }
 
-// Approve/Grant Access (redirect to OAuth login)
+// =========================
+// OAuth and Access Controls
+// =========================
+
+/**
+ * Redirects to OAuth login for access approval.
+ */
 document.getElementById('approve-button').addEventListener('click', () => {
     window.location.href = '/login';
 });
 
-// Revoke Access
+/**
+ * Revokes access by calling the backend and alerts the user.
+ */
 document.getElementById('revoke-button').addEventListener('click', async () => {
     try {
         const response = await fetch(`${apiUrl}/revoke`, { method: 'POST' });
@@ -122,7 +134,14 @@ document.getElementById('revoke-button').addEventListener('click', async () => {
     }
 });
 
-// Event listener for the fetch button
+// =========================
+// Patient Data Fetch Button
+// =========================
+
+/**
+ * Fetches patient data when the fetch button is clicked.
+ * Handles redirect if not authorized.
+ */
 document.getElementById('fetch-button').addEventListener('click', async () => {
     const statusDiv = document.getElementById('status');
     statusDiv.textContent = "Loading your info...";
@@ -135,14 +154,20 @@ document.getElementById('fetch-button').addEventListener('click', async () => {
         const data = await resp.json();
         statusDiv.textContent = "";
         // Build the patient info HTML using your updateUI logic, but return the HTML string instead of setting innerHTML
-        const patientInfoHTML = buildPatientInfoHTML(data); // You need to create this function
+        const patientInfoHTML = buildPatientInfoHTML(data);
         renderMainContent(patientInfoHTML);
     } catch (e) {
         statusDiv.textContent = "Failed to fetch info.";
     }
 });
 
-// Auto-fetch on load if ?fetch=1 in URL
+// =========================
+// Auto-fetch on Page Load
+// =========================
+
+/**
+ * If the URL contains ?fetch=1, auto-click the fetch button on load.
+ */
 window.addEventListener('DOMContentLoaded', function() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('fetch') === '1') {
@@ -150,7 +175,14 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Toggle Care Team section visibility
+// =========================
+// Care Team Section Toggle
+// =========================
+
+/**
+ * Expands or collapses a care team section by ID.
+ * @param {string} id - The DOM id of the care team section.
+ */
 function toggleCareTeamSection(id) {
     const el = document.getElementById(id);
     if (el) {
@@ -158,12 +190,20 @@ function toggleCareTeamSection(id) {
     }
 }
 
-// Build patient info HTML (for internal use, e.g., after fetch)
+// =========================
+// Patient Info HTML Builder
+// =========================
+
+/**
+ * Builds the patient info HTML (used by fetch and updateUI).
+ * @param {Object} data - Patient data object.
+ * @returns {string} - HTML string for patient info.
+ */
 function buildPatientInfoHTML(data) {
     if (data.error) {
         return `<div style="color:red;">${data.error}</div>`;
     }
-    // Format appointments
+    // Helper: Format a single appointment as HTML
     function formatAppt(appt) {
         return `
             <div style="margin-bottom:6px;">
@@ -175,18 +215,7 @@ function buildPatientInfoHTML(data) {
             </div>
         `;
     }
-    // Format care teams
-    function formatCareTeam(team) {
-        return `
-            <div style="margin-bottom:8px;">
-                <strong>Practitioner:</strong> ${team.practitioner || '—'}<br>
-                <strong>Organization:</strong> ${team.organization || '—'}<br>
-                <strong>Role:</strong> ${(team.role && team.role.length) ? team.role.join(', ') : '—'}<br>
-                <strong>Location(s):</strong> ${(team.locations && team.locations.length) ? team.locations.join(', ') : '—'}
-            </div>
-        `;
-    }
-    // Group care teams by location and make expandable
+    // Helper: Group care teams by location and render as expandable sections
     function renderCareTeamsExpandable(careTeams) {
         if (!careTeams || careTeams.length === 0) {
             return '<div style="color:#888;">None found.</div>';
@@ -246,8 +275,15 @@ function buildPatientInfoHTML(data) {
     `;
 }
 
+// =========================
+// Demo Table Copy-to-Clipboard
+// =========================
 
-// Copy to clipboard function for demo table
+/**
+ * Copies text to clipboard and gives visual feedback.
+ * @param {string} text - The text to copy.
+ * @param {HTMLElement} el - The element to update for feedback.
+ */
 function copyToClipboard(text, el) {
     navigator.clipboard.writeText(text).then(() => {
         el.style.color = "#43a047";
@@ -259,7 +295,14 @@ function copyToClipboard(text, el) {
     });
 }
 
-// Render checklist HTML (reuse this in both flex and centered modes)
+// =========================
+// Veteran Checklist Rendering
+// =========================
+
+/**
+ * Returns the HTML for the Veteran Health Care Connection Checklist.
+ * Used in both flex and centered modes.
+ */
 function getChecklistHTML() {
     return `
     <div class="veteran-checklist">
@@ -356,7 +399,14 @@ function getChecklistHTML() {
     `;
 }
 
-// This function will be called by your app.js updateUI
+// =========================
+// Main Content Rendering
+// =========================
+
+/**
+ * Renders the main content area with patient info and checklist.
+ * @param {string} patientInfoHTML - HTML string for patient info.
+ */
 function renderMainContent(patientInfoHTML) {
     const mainContent = document.getElementById('main-content');
     if (patientInfoHTML && patientInfoHTML.trim() !== '') {
@@ -380,8 +430,5 @@ function renderMainContent(patientInfoHTML) {
 // On page load, show only the checklist (no patient info yet)
 renderMainContent('');
 
-// In your app.js, after fetching and building the patient info HTML, call:
-// renderMainContent(patientInfoHTML);
-
-// Optionally, you can expose renderMainContent globally if needed:
+// Expose renderMainContent globally if needed elsewhere
 window.renderMainContent = renderMainContent;
